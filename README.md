@@ -68,6 +68,14 @@ npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma 
 npx prisma migrate resolve --applied <folder_name>
 ```
 
+## Environment variables
+
+Create .env file containing
+
+```bash
+DATABASE_URL="postgresql://postgres:password@backend-db:5432/backend-db?schema=public&connect_timeout=300"
+```
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).

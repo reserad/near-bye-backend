@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, user as User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from './types/user-dto';
@@ -9,14 +9,13 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
   async fetch(phoneNumber: string): Promise<User> {
     try {
-      return await this.prisma.user.findFirst({
+      return await this.prisma.user.findUnique({
         where: { phone_number: phoneNumber },
+        rejectOnNotFound: () => new NotFoundException(),
       });
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        console.error(e.code);
-        throw new Error('Error fetching user');
-      }
+      console.error(e);
+      throw e;
     }
   }
 

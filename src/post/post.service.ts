@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, post as Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PostDto } from './types/post-dto';
+import { formatISO } from 'date-fns';
 
 @Injectable()
 export class PostService {
@@ -32,19 +33,26 @@ export class PostService {
     }
   }
 
-  // async create(postDto: PostDto): Promise<Post> {
-  //   const {} = postDto;
-  //   try {
-  //     return await this.prisma.post.upsert({
-  //       where: {},
-  //       create: { ...postDto },
-  //       update: {},
-  //     });
-  //   } catch (e) {
-  //     if (e instanceof Prisma.PrismaClientKnownRequestError) {
-  //       console.error(e.code);
-  //       throw new Error('Error creating post');
-  //     }
-  //   }
-  // }
+  async create(postDto: PostDto): Promise<Post> {
+    const { body, title, userId, latitude, longitude } = postDto;
+    try {
+      return await this.prisma.post.upsert({
+        where: {},
+        create: {
+          body,
+          title,
+          user_id: userId,
+          created_at: formatISO(new Date()),
+          latitude,
+          longitude,
+        },
+        update: {},
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error(e.code);
+        throw new Error('Error creating post');
+      }
+    }
+  }
 }

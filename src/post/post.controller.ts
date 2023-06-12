@@ -13,7 +13,6 @@ export class PostController {
 
   @Post()
   async create(@Body() postDto: PostDto) {
-    return 'hello';
-    //return await this.postService.create(postDto);
+    return await this.postService.create(postDto);
   }
 }

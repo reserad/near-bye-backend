@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+  app:
+    container_name: near-bye-backend
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    command: npm run start:dev
+    ports:
+      - 3001:3001
+  backend-db:
+    container_name: near-bye-backend-db
+    restart: always
+    image: postgres
+    build:
+      dockerfile: Dockerfile-db
+      context: .
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: backend-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+      - ./tmp/pgdata/backend:/var/lib/postgresql/data

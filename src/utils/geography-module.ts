@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { GeographyService } from './geography-service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Module({
   providers: [GeographyService, PrismaService],

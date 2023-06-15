@@ -6,11 +6,6 @@ import { UserDto } from './types/user-dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  blah() {
-    return 'HI THERE';
-  }
-
   @Get(':phoneNumber')
   async fetch(@Param('phoneNumber') phoneNumber: string) {
     return await this.userService.fetch(phoneNumber);

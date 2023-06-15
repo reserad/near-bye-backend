@@ -1,5 +1,9 @@
 version: '3.1'
 
+networks:
+  near-bye-network:
+    external: true
+
 services:
   app:
     container_name: near-bye-backend
@@ -14,6 +18,8 @@ services:
     command: npm run start:dev
     ports:
       - 3001:3001
+    networks:
+      - near-bye-network
   backend-db:
     container_name: near-bye-backend-db
     restart: always
@@ -30,3 +36,5 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
       - ./tmp/pgdata/backend:/var/lib/postgresql/data
+    networks:
+      - near-bye-network

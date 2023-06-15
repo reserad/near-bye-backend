@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, post as Post } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PostDto } from './types/post-dto';
 import { formatISO } from 'date-fns';
-import { GeographyService } from 'src/shared/utils/geography-service';
+import { GeographyService } from 'src/utils/geography-service';
 import { PostFetchAllDto } from './types/post-fetch-all-dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PostService {

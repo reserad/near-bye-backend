@@ -14,7 +14,7 @@ export class UserService {
   }
 
   async create(userDto: UserDto): Promise<User> {
-    const { phoneNumber, baseLatitude, baseLongitude } = userDto;
+    const { phoneNumber } = userDto;
     return await this.prisma.user.upsert({
       where: {
         phone_number: phoneNumber,
@@ -22,8 +22,6 @@ export class UserService {
       create: {
         phone_number: phoneNumber,
         created_at: formatISO(new Date()),
-        base_lattitude: baseLatitude,
-        base_longitude: baseLongitude,
       },
       update: {},
     });

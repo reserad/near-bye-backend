@@ -20,6 +20,8 @@ services:
       - 3001:3001
     networks:
       - near-bye-network
+    depends_on:
+      - backend-db
   backend-db:
     container_name: near-bye-backend-db
     restart: always

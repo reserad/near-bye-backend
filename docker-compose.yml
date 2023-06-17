@@ -13,6 +13,8 @@ services:
       context: .
     env_file:
       - .env
+      - rsa-keys-dev/private.test.pem.env
+      - rsa-keys-dev/public.test.pem.env
     volumes:
       - .:/usr/src/app
     command: npm run start:dev
@@ -38,5 +40,12 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
       - ./tmp/pgdata/backend:/var/lib/postgresql/data
+    networks:
+      - near-bye-network
+  redis:
+    image: redis
+    command: redis-server
+    ports:
+      - '6379:6379'
     networks:
       - near-bye-network

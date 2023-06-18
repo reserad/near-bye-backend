@@ -8,6 +8,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get()
+  async getCurrentUser() {
+    //return await this.au
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':phoneNumber')
   async fetch(@Param('phoneNumber') phoneNumber: string) {
     return await this.userService.fetch(phoneNumber);

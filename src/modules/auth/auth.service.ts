@@ -31,7 +31,7 @@ export class AuthService {
     }
   }
 
-  async verifyOtp(phoneNumber: string, code: string) {
+  async verifyOtp(phoneNumber: string, code: string): Promise<JwtToken> {
     try {
       return await this.apiService.post<JwtToken>(
         `${this.endPoints.auth}/verify`,

@@ -1,21 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { user as User } from '@prisma/client';
 import { UserDto } from './types/user-dto';
 import { formatISO } from 'date-fns';
 import { PrismaService } from '../prisma/prisma.service';
+import { User } from './types/user.type';
+import { mapPrismaUser } from './utils/user-prisma-mapper';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
   async fetch(phoneNumber: string): Promise<User> {
-    return await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { phone_number: phoneNumber },
     });
+    return mapPrismaUser(user);
   }
 
   async create(userDto: UserDto): Promise<User> {
     const { phoneNumber } = userDto;
-    return await this.prisma.user.upsert({
+    const user = await this.prisma.user.upsert({
       where: {
         phone_number: phoneNumber,
       },
@@ -25,5 +27,7 @@ export class UserService {
       },
       update: {},
     });
+
+    return mapPrismaUser(user);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { OtpRequestDto } from './dto/otp-request-dto';
 import { OtpVerifyDto } from './dto/otp-verify-dto';
@@ -14,7 +14,7 @@ export class AuthController {
   @Post('/send')
   async sendOtp(@Body() otpRequestDto: OtpRequestDto) {
     const user = await this.userService.create(otpRequestDto);
-    return await this.authService.sendOtp(user.phone_number);
+    return await this.authService.sendOtp(user.phoneNumber);
   }
 
   @Post('/verify')

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, post as Post } from '@prisma/client';
+import { Prisma, Post } from '@prisma/client';
 import { PostDto } from './types/post-dto';
 import { formatISO } from 'date-fns';
 import { GeographyService } from 'src/utils/geography-service';
@@ -53,8 +53,8 @@ export class PostService {
         data: {
           body,
           title,
-          user_id: userId,
-          created_at: formatISO(new Date()),
+          userId,
+          createdAt: formatISO(new Date()),
           latitude,
           longitude,
         },

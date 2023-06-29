@@ -1,4 +1,4 @@
 export type JwtStrategyPayload = {
-  id: string;
+  userId: string;
   phoneNumber: string;
 };

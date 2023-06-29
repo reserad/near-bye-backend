@@ -1,3 +1,9 @@
 export type JwtToken = {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenId: string;
+  user: {
+    id: string;
+    phoneNumber: string;
+  };
 };

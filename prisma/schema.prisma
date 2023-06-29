@@ -19,21 +19,21 @@ model spatial_ref_sys {
 
 model Post {
   id        String  @id(map: "post_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title     String  @db.VarChar
   body      String  @db.VarChar
   createdAt String  @db.VarChar
-  userId    String  @db.Uuid
+  authorId    String  @db.Uuid
   longitude Decimal @db.Decimal
   latitude  Decimal @db.Decimal
-  User      User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_fk")
+  author      User    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_fk")
 }
 
 model Profile {
-  userId       String  @id(map: "profile_pk") @db.Uuid
+  id           String  @id(map: "profile_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String  @db.Uuid @unique
   profileImage String? @db.VarChar
   bio          String? @db.VarChar
-  name         String  @db.VarChar
-  User         User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_fk")
+  name         String? @db.VarChar
+  user         User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_fk")
 }
 
 model Token {
@@ -43,7 +43,7 @@ model Token {
   expiresAt String @db.VarChar
   createdAt String @db.VarChar
   updatedAt String @db.VarChar
-  User      User   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_fk")
+  user      User   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_fk")
 }
 
 model User {
@@ -52,7 +52,7 @@ model User {
   baseLongitude Decimal? @db.Decimal
   createdAt     String   @db.VarChar
   baseLatitude  Decimal? @db.Decimal
-  Post          Post[]
-  Profile       Profile?
-  Token         Token[]
+  post          Post[]
+  profile       Profile?
+  token         Token[]
 }

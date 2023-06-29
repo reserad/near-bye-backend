@@ -8,6 +8,6 @@ export class GeographyService {
     const radiusInKm = 20 * 1000;
     return await this.prisma.$queryRaw<
       { id: string }[]
-    >`SELECT id FROM "post" WHERE ST_DWithin(ST_MakePoint(longitude, latitude), ST_MakePoint(${longitude}, ${latitude})::geography, ${radiusInKm})`;
+    >`SELECT id FROM "Post" WHERE ST_DWithin(ST_MakePoint(longitude, latitude), ST_MakePoint(${longitude}, ${latitude})::geography, ${radiusInKm})`;
   };
 }

@@ -12,6 +12,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
   catch(exception: PrismaClientKnownRequestError, host: ArgumentsHost) {
     const message = exception.message.replace(/\n/g, '');
     switch (exception.code) {
+      case 'P2003':
       case 'P2015':
       case 'P2025': {
         const statusCode = HttpStatus.NOT_FOUND;

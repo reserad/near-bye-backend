@@ -1,15 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './types/user-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from 'src/guards/user.guard';
+import { JwtStrategyPayload } from '../auth/types/jwt-strategy-payload-type';
 
 @Controller('users')
 export class UserController {
@@ -17,8 +11,8 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getCurrentUser(@Headers('Authorization') auth: any) {
-    return await this.userService.fetch('9376710051');
+  async getCurrentUser(@User() user: JwtStrategyPayload) {
+    return await this.userService.fetch(user.phoneNumber);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -27,6 +21,7 @@ export class UserController {
     return await this.userService.fetch(phoneNumber);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() userDto: UserDto) {
     return await this.userService.create(userDto);

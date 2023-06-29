@@ -22,6 +22,9 @@ export class UserService {
       create: {
         phoneNumber,
         createdAt: formatISO(new Date()),
+        profile: {
+          create: {},
+        },
       },
       update: {},
     });

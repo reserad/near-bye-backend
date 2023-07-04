@@ -1,17 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Post } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { PostDto } from './types/post-dto';
 import { formatISO } from 'date-fns';
 import { GeographyService } from 'src/utils/geography-service';
 import { PostFetchAllDto } from './types/post-fetch-all-dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PostResponse } from './types/post-response';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class PostService {
   constructor(
     private prisma: PrismaService,
     private geographyService: GeographyService,
+    private logger: PinoLogger,
   ) {}
   async fetch(id: string): Promise<Post> {
     try {
@@ -20,7 +22,8 @@ export class PostService {
         rejectOnNotFound: () => new NotFoundException(),
       });
     } catch (e) {
-      console.error(e);
+      const message = 'Failed to fetch post';
+      this.logger.error(e, message);
       throw e;
     }
   }
@@ -45,16 +48,16 @@ export class PostService {
             },
           },
         },
+        orderBy: [{ createdAt: 'desc' }],
       });
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        console.error(e.message);
-        throw e;
-      }
+      const message = 'Failed to fetch posts';
+      this.logger.error(e, message);
+      throw e;
     }
   }
 
-  async create(dto: PostDto): Promise<Post> {
+  async create(dto: PostDto): Promise<PostResponse> {
     const { body, userId, latitude, longitude } = dto;
     try {
       return await this.prisma.post.create({
@@ -65,13 +68,18 @@ export class PostService {
           latitude,
           longitude,
         },
+        include: {
+          author: {
+            include: {
+              profile: true,
+            },
+          },
+        },
       });
     } catch (e) {
-      console.log(e);
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        console.error(e.code);
-        throw e;
-      }
+      const message = 'Failed to create post';
+      this.logger.error(e, message);
+      throw e;
     }
   }
 }

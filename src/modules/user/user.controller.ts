@@ -21,7 +21,6 @@ export class UserController {
     return await this.userService.fetch(phoneNumber);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() userDto: UserDto) {
     return await this.userService.create(userDto);

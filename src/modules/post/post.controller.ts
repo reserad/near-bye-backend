@@ -17,7 +17,6 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async fetchAll(@Body() dto: PostFetchAllDto) {
-    console.log('DTO: ', dto);
     return await this.postService.fetchAll(dto);
   }
 

@@ -8,6 +8,8 @@ import { FeedItem } from './types/feed-item';
 import { PinoLogger } from 'nestjs-pino';
 import { JwtStrategyPayload } from '../auth/types/jwt-strategy-payload-type';
 import { getFeedQuery } from './sql/getFeed';
+import { VoteDto } from './types/vote-dto';
+import { VoteType } from './types/vote-type';
 
 @Injectable()
 export class PostService {
@@ -50,11 +52,7 @@ export class PostService {
           longitude,
           votes: {
             create: {
-              userVote: {
-                create: {
-                  authorId: userId,
-                },
-              },
+              userId,
             },
           },
         },
@@ -65,6 +63,81 @@ export class PostService {
       });
     } catch (e) {
       const message = 'Failed to create post';
+      this.logger.error(e, message);
+      throw e;
+    }
+  }
+
+  async vote(user: JwtStrategyPayload, dto: VoteDto): Promise<void> {
+    const { userId } = user;
+    const { type, postId } = dto;
+    try {
+      const previousVote = await this.prisma.vote.findFirst({
+        where: {
+          postId,
+          userId,
+        },
+      });
+      const determineUpvoteState = () => {
+        switch (type) {
+          case VoteType.DOWNVOTE:
+            return false;
+          case VoteType.UPVOTE:
+            if (previousVote.upvoted) {
+              return false;
+            }
+            return true;
+          default:
+            return false;
+        }
+      };
+
+      const determineDownvoteState = () => {
+        switch (type) {
+          case VoteType.UPVOTE:
+            return false;
+          case VoteType.DOWNVOTE:
+            if (previousVote.downvoted) {
+              return false;
+            }
+            return true;
+          default:
+            return false;
+        }
+      };
+      // await this.prisma.vote.deleteMany({
+      //   where: {
+      //     postId,
+      //     userId,
+      //   },
+      // });
+      await this.prisma.vote.update({
+        where: {
+          postId_userId: { postId, userId },
+        },
+        data: {
+          upvoted: determineUpvoteState(),
+          downvoted: determineDownvoteState(),
+        },
+      });
+      // await this.prisma.vote.upsert({
+      //   where: {
+      //     postId_userId
+      //   },
+      //   create: {
+      //     upvoted: type === VoteStatus.UPVOTED,
+      //     downvoted: type === VoteStatus.DOWNVOTED,
+      //     userId,
+      //     postId,
+      //   },
+      //   update: {
+      //     upvoted: type === VoteStatus.UPVOTED,
+      //     downvoted: type === VoteStatus.DOWNVOTED,
+      //     userId,
+      //   },
+      // });
+    } catch (e) {
+      const message = 'Failed to fetch posts';
       this.logger.error(e, message);
       throw e;
     }

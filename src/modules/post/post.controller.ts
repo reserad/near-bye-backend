@@ -5,6 +5,7 @@ import { FeedDto } from './types/feed-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtStrategyPayload } from '../auth/types/jwt-strategy-payload-type';
 import { User } from 'src/guards/user.guard';
+import { VoteDto } from './types/vote-dto';
 
 @Controller('posts')
 export class PostController {
@@ -26,5 +27,11 @@ export class PostController {
   @Post()
   async create(@Body() dto: PostDto) {
     return await this.postService.create(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/vote')
+  async vote(@User() user: JwtStrategyPayload, @Body() dto: VoteDto) {
+    return await this.postService.vote(user, dto);
   }
 }

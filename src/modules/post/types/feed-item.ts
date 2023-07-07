@@ -1,3 +1,5 @@
+import { VoteStatus } from './vote-status';
+
 export type FeedItem = {
   id: string;
   body: string;
@@ -9,9 +11,3 @@ export type FeedItem = {
   authorImage: string;
   auhtorId: string;
 };
-
-export enum VoteStatus {
-  UPVOTED = 'upvoted',
-  DOWNVOTED = 'downvoted',
-  NEITHER = 'neither',
-}

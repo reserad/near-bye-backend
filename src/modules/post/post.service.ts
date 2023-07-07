@@ -2,19 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PostDto } from './types/post-dto';
 import { formatISO } from 'date-fns';
-import { GeographyService } from 'src/utils/geography-service';
-import { PostFetchAllDto } from './types/post-fetch-all-dto';
+import { FeedDto } from './types/feed-dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { PostResponse } from './types/post-response';
+import { FeedItem } from './types/feed-item';
 import { PinoLogger } from 'nestjs-pino';
+import { JwtStrategyPayload } from '../auth/types/jwt-strategy-payload-type';
+import { getFeedQuery } from './sql/getFeed';
 
 @Injectable()
 export class PostService {
-  constructor(
-    private prisma: PrismaService,
-    private geographyService: GeographyService,
-    private logger: PinoLogger,
-  ) {}
+  constructor(private prisma: PrismaService, private logger: PinoLogger) {}
   async fetch(id: string): Promise<Post> {
     try {
       return await this.prisma.post.findUnique({
@@ -28,28 +25,12 @@ export class PostService {
     }
   }
 
-  async fetchAll(dto: PostFetchAllDto): Promise<PostResponse[]> {
-    const { latitude, longitude } = dto;
+  async getFeed(user: JwtStrategyPayload, dto: FeedDto): Promise<FeedItem[]> {
+    const { userId } = user;
     try {
-      const geoQuery = await this.geographyService.getPostsWithinProximity(
-        longitude,
-        latitude,
+      return await this.prisma.$queryRaw<FeedItem[]>(
+        getFeedQuery({ userId, ...dto }),
       );
-      return await this.prisma.post.findMany({
-        where: {
-          id: {
-            in: geoQuery.map(({ id }) => id),
-          },
-        },
-        include: {
-          author: {
-            include: {
-              profile: true,
-            },
-          },
-        },
-        orderBy: [{ createdAt: 'desc' }],
-      });
     } catch (e) {
       const message = 'Failed to fetch posts';
       this.logger.error(e, message);
@@ -57,7 +38,7 @@ export class PostService {
     }
   }
 
-  async create(dto: PostDto): Promise<PostResponse> {
+  async create(dto: PostDto) {
     const { body, userId, latitude, longitude } = dto;
     try {
       return await this.prisma.post.create({
@@ -67,13 +48,19 @@ export class PostService {
           createdAt: formatISO(new Date()),
           latitude,
           longitude,
-        },
-        include: {
-          author: {
-            include: {
-              profile: true,
+          votes: {
+            create: {
+              userVote: {
+                create: {
+                  authorId: userId,
+                },
+              },
             },
           },
+        },
+        include: {
+          author: true,
+          votes: true,
         },
       });
     } catch (e) {

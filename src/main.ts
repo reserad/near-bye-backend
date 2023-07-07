@@ -14,3 +14,8 @@ async function bootstrap() {
   await app.listen(3001, '0.0.0.0');
 }
 bootstrap();
+
+// Necessary when running the raw prisma query 'getFeedQuery'
+BigInt.prototype['toJSON'] = function () {
+  return this.toString();
+};

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Vote" ALTER COLUMN "upvoted" DROP NOT NULL,
+ALTER COLUMN "upvoted" SET DEFAULT true,
+ALTER COLUMN "downvoted" DROP NOT NULL,
+ALTER COLUMN "downvoted" SET DEFAULT false;

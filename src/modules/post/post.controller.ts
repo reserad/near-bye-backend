@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
 import { PostDto } from './types/post-dto';
-import { PostFetchAllDto } from './types/post-fetch-all-dto';
+import { FeedDto } from './types/feed-dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtStrategyPayload } from '../auth/types/jwt-strategy-payload-type';
+import { User } from 'src/guards/user.guard';
 
 @Controller('posts')
 export class PostController {
@@ -16,8 +18,8 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async fetchAll(@Body() dto: PostFetchAllDto) {
-    return await this.postService.fetchAll(dto);
+  async getFeed(@User() user: JwtStrategyPayload, @Body() dto: FeedDto) {
+    return await this.postService.getFeed(user, dto);
   }
 
   @UseGuards(JwtAuthGuard)

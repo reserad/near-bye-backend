@@ -18,14 +18,15 @@ model spatial_ref_sys {
 }
 
 model Post {
-  id        String  @id(map: "post_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body      String  @db.VarChar
-  createdAt String  @db.VarChar
-  longitude Decimal @db.Decimal
-  latitude  Decimal @db.Decimal
-  authorId  String  @db.Uuid
-  author    User    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_fk")
+  id        String    @id(map: "post_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body      String    @db.VarChar
+  createdAt String    @db.VarChar
+  longitude Decimal   @db.Decimal
+  latitude  Decimal   @db.Decimal
+  authorId  String    @db.Uuid
+  author    User      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_fk")
   votes     Vote[]
+  comments  Comment[]
 }
 
 model Token {
@@ -39,26 +40,40 @@ model Token {
 }
 
 model User {
-  id            String     @id(map: "user_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phoneNumber   String     @unique(map: "user_phone_un") @db.VarChar
-  baseLongitude Decimal?   @db.Decimal
-  createdAt     String     @db.VarChar
-  baseLatitude  Decimal?   @db.Decimal
-  profileImage  String?    @db.VarChar
-  bio           String?    @db.VarChar
-  name          String?    @db.VarChar
+  id            String    @id(map: "user_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phoneNumber   String    @unique(map: "user_phone_un") @db.VarChar
+  baseLongitude Decimal?  @db.Decimal
+  createdAt     String    @db.VarChar
+  baseLatitude  Decimal?  @db.Decimal
+  profileImage  String?   @db.VarChar
+  bio           String?   @db.VarChar
+  name          String?   @db.VarChar
   tokens        Token[]
   posts         Post[]
-  votes     Vote[]
+  votes         Vote[]
+  comments      Comment[]
 }
 
 model Vote {
-  postId    String    @db.Uuid
-  userId    String    @db.Uuid
-  upvoted   Boolean?  @default(true)
-  downvoted Boolean?  @default(false)
-  post      Post      @relation(fields: [postId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  postId    String   @db.Uuid
+  userId    String   @db.Uuid
+  upvoted   Boolean? @default(true)
+  downvoted Boolean? @default(false)
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
   @@id([postId, userId])
 }
 
+model Comment {
+  id        String    @id(map: "comment_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parentId  String?   @db.Uuid
+  parent    Comment?  @relation("comment_relation", fields: [parentId], references: [id])
+  children  Comment[] @relation("comment_relation")
+  authorId  String    @db.Uuid
+  author    User      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_fk")
+  postId    String    @db.Uuid
+  post      Post      @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_post_fk")
+  body      String    @db.VarChar
+  createdAt String    @db.VarChar
+}

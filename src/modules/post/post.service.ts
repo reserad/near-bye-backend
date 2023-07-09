@@ -18,6 +18,13 @@ export class PostService {
     try {
       return await this.prisma.post.findUnique({
         where: { id },
+        include: {
+          comments: {
+            include: {
+              author: true,
+            },
+          },
+        },
         rejectOnNotFound: () => new NotFoundException(),
       });
     } catch (e) {

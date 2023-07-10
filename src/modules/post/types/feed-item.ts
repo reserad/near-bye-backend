@@ -10,4 +10,5 @@ export type FeedItem = {
   authorName: string;
   authorImage: string;
   auhtorId: string;
+  commentCount: number;
 };

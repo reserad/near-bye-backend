@@ -17,10 +17,11 @@ export const getFeedQuery = ({
 }: QueryPayload) => {
   return Prisma.sql`SELECT 
   p.id, 
-  body, 
-  p."createdAt", 
-  count(CASE WHEN v.upvoted THEN 1 END) AS "upvotes", 
-  count(CASE WHEN v.downvoted THEN 1 END) AS "downvotes",
+  p.body, 
+  p."createdAt",
+  p."authorId",
+  v.upvotes,
+  v.downvotes,
   CASE WHEN v."userId" = ${userId}::UUID THEN 
     CASE 
       WHEN v.upvoted THEN 'upvoted'
@@ -31,13 +32,24 @@ export const getFeedQuery = ({
   END AS "userVoteStatus",
   u."name" AS "authorName",
   u."profileImage" AS "authorImage",
-  p."authorId"
-FROM "Post" p 
-INNER JOIN "Vote" v ON v."postId" = p.id 
-INNER JOIN "User" u ON u."id" = p."authorId"
-WHERE ST_DWithin(ST_MakePoint(longitude, latitude), ST_MakePoint(${longitude}, ${latitude})::geography, ${radiusInKm})
-GROUP BY p.id, v.upvoted, v.downvoted, v."userId", u."name", u."profileImage"
-ORDER BY p."createdAt" DESC
-LIMIT ${limit}
-OFFSET ${offset}`;
+  COUNT(c."postId") as "commentCount"
+  from "Post" p
+  left JOIN "User" u ON u."id" = p."authorId"
+  inner join (
+    select
+      vote."userId",
+      vote."postId",
+      vote.upvoted,
+      vote.downvoted,
+      count(CASE WHEN vote.upvoted THEN 1 END) AS "upvotes", 
+      count(CASE WHEN vote.downvoted THEN 1 END) AS "downvotes"
+    from "Vote" vote
+    group by vote."userId", vote."postId", vote.upvoted, vote.downvoted
+  ) as v on v."postId" = p.id
+  left join "Comment" c on c."postId" = p.id
+  WHERE ST_DWithin(ST_MakePoint(longitude, latitude), ST_MakePoint(${longitude}, ${latitude})::geography, ${radiusInKm})
+  GROUP BY p.id, v."userId", u."name", u."profileImage", v.upvoted, v.downvoted, p.body, p."createdAt", c."postId", v.upvotes, v.downvotes
+  ORDER BY p."createdAt" DESC
+  LIMIT ${limit}
+  OFFSET ${offset}`;
 };

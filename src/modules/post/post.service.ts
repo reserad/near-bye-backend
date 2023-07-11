@@ -112,37 +112,21 @@ export class PostService {
             return false;
         }
       };
-      // await this.prisma.vote.deleteMany({
-      //   where: {
-      //     postId,
-      //     userId,
-      //   },
-      // });
-      await this.prisma.vote.update({
+      await this.prisma.vote.upsert({
         where: {
           postId_userId: { postId, userId },
         },
-        data: {
+        create: {
+          upvoted: determineUpvoteState(),
+          downvoted: determineDownvoteState(),
+          userId,
+          postId,
+        },
+        update: {
           upvoted: determineUpvoteState(),
           downvoted: determineDownvoteState(),
         },
       });
-      // await this.prisma.vote.upsert({
-      //   where: {
-      //     postId_userId
-      //   },
-      //   create: {
-      //     upvoted: type === VoteStatus.UPVOTED,
-      //     downvoted: type === VoteStatus.DOWNVOTED,
-      //     userId,
-      //     postId,
-      //   },
-      //   update: {
-      //     upvoted: type === VoteStatus.UPVOTED,
-      //     downvoted: type === VoteStatus.DOWNVOTED,
-      //     userId,
-      //   },
-      // });
     } catch (e) {
       const message = 'Failed to fetch posts';
       this.logger.error(e, message);

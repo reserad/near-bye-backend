@@ -63,6 +63,7 @@ model Vote {
   user      User     @relation(fields: [userId], references: [id])
 
   @@id([postId, userId])
+  @@unique([postId, userId])
 }
 
 model Comment {

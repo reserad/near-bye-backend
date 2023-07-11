@@ -13,8 +13,8 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async fetch(@Param('id') id: string) {
-    return await this.postService.fetch(id);
+  async fetch(@User() user: JwtStrategyPayload, @Param('id') id: string) {
+    return await this.postService.fetch(user, id);
   }
 
   @UseGuards(JwtAuthGuard)

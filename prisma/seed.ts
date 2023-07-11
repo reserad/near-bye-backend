@@ -1,4 +1,4 @@
-import { Post, PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { formatISO } from 'date-fns';
 
 const johnId = 'e437ee57-18c8-4410-a809-219144c0aadf';
@@ -28,6 +28,22 @@ const bobPosts = [
   {
     id: '713cb4bd-643f-4793-9b96-35977c74d635',
     body: 'As you consider all the possible ways to improve yourself and the world, you notice John Travolta seems fairly unhappy.',
+    createdAt: formatISO(new Date()),
+    latitude: 39.33282104790148,
+    longitude: -84.22315780081247,
+  },
+];
+const johnPosts = [
+  {
+    id: 'dee1e133-1c33-4a4f-94e8-675b56a9664e',
+    body: `It would have been a better night if the guys next to us weren't in the splash zone.`,
+    createdAt: formatISO(new Date()),
+    latitude: 39.33282104790148,
+    longitude: -84.22315780081247,
+  },
+  {
+    id: '0202fec1-3714-4085-8212-334a417cdee7',
+    body: `I'll have you know I've written over fifty novels`,
     createdAt: formatISO(new Date()),
     latitude: 39.33282104790148,
     longitude: -84.22315780081247,
@@ -64,31 +80,16 @@ async function createUsers() {
 
   const john = await prisma.user.upsert({
     where: {
-      id: 'e437ee57-18c8-4410-a809-219144c0aadf',
+      id: johnId,
     },
     create: {
-      id: 'e437ee57-18c8-4410-a809-219144c0aadf',
+      id: johnId,
       phoneNumber: '1234567891',
       createdAt: formatISO(new Date()),
       name: 'John',
       posts: {
         createMany: {
-          data: [
-            {
-              id: 'dee1e133-1c33-4a4f-94e8-675b56a9664e',
-              body: `It would have been a better night if the guys next to us weren't in the splash zone.`,
-              createdAt: formatISO(new Date()),
-              latitude: 39.33282104790148,
-              longitude: -84.22315780081247,
-            },
-            {
-              id: '0202fec1-3714-4085-8212-334a417cdee7',
-              body: `I'll have you know I've written over fifty novels`,
-              createdAt: formatISO(new Date()),
-              latitude: 39.33282104790148,
-              longitude: -84.22315780081247,
-            },
-          ],
+          data: johnPosts,
         },
       },
     },
@@ -97,28 +98,48 @@ async function createUsers() {
     },
     update: {},
   });
-  return { bob, john };
 }
 
 async function createVotes() {
-  const input = [
-    {
-      postId: '5a2fedfc-7809-4453-93c1-ee0722c7579c',
-      userId: bobId,
-    },
-    {
-      postId: 'ecbcadaa-cd28-4a35-8985-2c5d3a3c3a07',
-      userId: bobId,
-    },
-  ];
-  input.forEach(async ({ postId, userId }) => {
+  bobPosts.forEach(async ({ id: postId }) => {
     await prisma.vote.upsert({
       where: {
-        postId_userId: { postId, userId },
+        postId_userId: { postId, userId: bobId },
       },
       create: {
         postId,
-        userId,
+        userId: bobId,
+        downvoted: false,
+        upvoted: true,
+      },
+      update: {},
+    });
+  });
+
+  // bob votes on all john posts
+  johnPosts.forEach(async ({ id: postId }) => {
+    await prisma.vote.upsert({
+      where: {
+        postId_userId: { postId, userId: bobId },
+      },
+      create: {
+        postId,
+        userId: bobId,
+        downvoted: false,
+        upvoted: true,
+      },
+      update: {},
+    });
+  });
+
+  johnPosts.forEach(async ({ id: postId }) => {
+    await prisma.vote.upsert({
+      where: {
+        postId_userId: { postId, userId: johnId },
+      },
+      create: {
+        postId,
+        userId: johnId,
         downvoted: false,
         upvoted: true,
       },

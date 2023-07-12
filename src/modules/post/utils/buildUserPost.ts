@@ -10,7 +10,7 @@ export const buildUserPost = (
   if (userVote) {
     if (userVote.upvoted) {
       userVoteStatus = VoteStatus.UPVOTED;
-    } else {
+    } else if (userVote.downvoted) {
       userVoteStatus = VoteStatus.DOWNVOTED;
     }
   }

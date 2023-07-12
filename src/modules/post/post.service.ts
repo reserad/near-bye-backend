@@ -24,13 +24,13 @@ export class PostService {
           comments: {
             include: {
               author: true,
+              children: true,
             },
           },
           votes: true,
         },
         rejectOnNotFound: () => new NotFoundException(),
       });
-
       return buildUserPost(post, userId);
     } catch (e) {
       const message = 'Failed to fetch post';
@@ -56,6 +56,7 @@ export class PostService {
           comments: {
             include: {
               author: true,
+              children: true,
             },
           },
           votes: true,

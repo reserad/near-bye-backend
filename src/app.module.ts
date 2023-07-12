@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
     AuthModule,
     UserModule,
     PostModule,
+    CommentModule,
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -24,7 +24,11 @@ export class PostService {
           comments: {
             include: {
               author: true,
-              children: true,
+              children: {
+                include: {
+                  author: true,
+                },
+              },
             },
           },
           votes: true,

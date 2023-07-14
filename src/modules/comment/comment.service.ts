@@ -12,8 +12,21 @@ export class CommentService {
         where: { id },
         include: {
           author: true,
-          parent: true,
-          children: true,
+          parent: {
+            include: {
+              author: true,
+            },
+          },
+          children: {
+            include: {
+              author: true,
+              children: {
+                include: {
+                  author: true,
+                },
+              },
+            },
+          },
         },
         rejectOnNotFound: () => new NotFoundException(),
       });

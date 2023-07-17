@@ -80,11 +80,15 @@ export class PostService {
   }
 
   async create(dto: PostDto): Promise<UserPost> {
-    const { body, userId, latitude, longitude } = dto;
+    const { body, imageUrls, userId, latitude, longitude } = dto;
+    const bodyJson = {
+      text: body,
+      imageUrls,
+    };
     try {
       const post = await this.prisma.post.create({
         data: {
-          body,
+          body: JSON.stringify(bodyJson),
           authorId: userId,
           createdAt: formatISO(new Date()),
           latitude,

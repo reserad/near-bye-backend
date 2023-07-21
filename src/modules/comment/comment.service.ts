@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { Comment } from '@prisma/client';
@@ -8,7 +8,7 @@ export class CommentService {
   constructor(private prisma: PrismaService, private logger: PinoLogger) {}
   async fetch(id: string): Promise<Comment> {
     try {
-      const comment = await this.prisma.comment.findUnique({
+      const comment = await this.prisma.comment.findUniqueOrThrow({
         where: { id },
         include: {
           author: true,
@@ -28,7 +28,6 @@ export class CommentService {
             },
           },
         },
-        rejectOnNotFound: () => new NotFoundException(),
       });
 
       return comment;

@@ -10,6 +10,7 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
+  app.enableShutdownHooks();
 
   await app.listen(3001, '0.0.0.0');
 }

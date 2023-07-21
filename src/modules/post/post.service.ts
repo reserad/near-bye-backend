@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PostDto } from './types/post-dto';
 import { formatISO } from 'date-fns';
 import { FeedDto } from './types/feed-dto';
@@ -17,7 +17,7 @@ export class PostService {
   async fetch(user: JwtStrategyPayload, id: string): Promise<UserPost> {
     const { userId } = user;
     try {
-      const post = await this.prisma.post.findUnique({
+      const post = await this.prisma.post.findUniqueOrThrow({
         where: { id },
         include: {
           author: true,
@@ -33,7 +33,6 @@ export class PostService {
           },
           votes: true,
         },
-        rejectOnNotFound: () => new NotFoundException(),
       });
       return buildUserPost(post, userId);
     } catch (e) {
